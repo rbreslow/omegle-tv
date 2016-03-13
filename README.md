@@ -15,6 +15,17 @@ $ npm install
 
 Usage
 ---
+To start the bot:
 ```shell
-SLACK_TOKEN=<token> SLACK_CHANNEL=<channel> SLACK_ICON=<icon url> npm start
+$ SLACK_TOKEN=<token> SLACK_CHANNEL=<channel> SLACK_ICON=<icon url for bot> SLACK_ICON_A=<person a icon url> SLACK_ICON_B=<person b icon url> npm start
 ```
+
+Commands
+---
+`!retry` searches for a new chat session.
+
+`!topic <topics>` sets the topics. ex: `!topic roleplay tumblr`.
+
+`!saya <message>` says something as Person A to Person B. ex: `!saya yo yo yo sup`.
+
+`!sayb <message>` says something as Person B to Person A.

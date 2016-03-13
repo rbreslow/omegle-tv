@@ -13,7 +13,6 @@ var cluster   = require('cluster'),
     EventEnum = require('./lib/EventEnum');
 
 // worker process which interfaces with Omegle
-if(!cluster.isMaster) {
     require('./lib/OmegleWorker');
     return;
 }
@@ -55,11 +54,6 @@ var topics = [];
 var slackBot = new SlackBot({
     token: process.env.SLACK_TOKEN,
     name: 'ManInTheMiddle'
-});
-
-// log when a connection is established to Slack
-slackBot.on('start', function() {
-    Logger.log('info', 'established connection to Slack');
 });
 
 slackBot.on('message', function(event) {
@@ -135,6 +129,27 @@ slackBot.on('message', function(event) {
                     regularRestart();
                 });
                 break;
+            case 'saya':
+                if(isSessionActive) {
+                    slackBot.postMessageToChannel(process.env.SLACK_CHANNEL, '```' + args.join(" ") + '```', {
+                        username: 'Person A',
+                        icon_url: process.env.SLACK_ICON_A
+                    });
+
+                    bWorker.send({ event: new Event(EventEnum.MESSAGE, args.join(" ")) });
+                }
+
+                break;
+            case 'sayb':
+                if(isSessionActive) {
+                    slackBot.postMessageToChannel(process.env.SLACK_CHANNEL, '```' + args.join(" ") + '```', {
+                        username: 'Person B',
+                        icon_url: process.env.SLACK_ICON_B
+                    });
+
+                    aWorker.send({ event: new Event(EventEnum.MESSAGE, args.join(" ")) });
+                }
+                break;
         }
 
     }
@@ -201,9 +216,9 @@ aWorker.on('message', function(message) {
 
     // post message on Slack
     if(event.type === EventEnum.MESSAGE) {
-        slackBot.postMessageToChannel(process.env.SLACK_CHANNEL, message.event.data, {
+        slackBot.postMessageToChannel(process.env.SLACK_CHANNEL, '```' + message.event.data + '```', {
             username: 'Person A',
-            icon_url: process.env.SLACK_ICON
+            icon_url: process.env.SLACK_ICON_A
         });
     }
 
@@ -290,9 +305,9 @@ bWorker.on('message', function(message) {
 
     // post message on Slack
     if(event.type === EventEnum.MESSAGE) {
-        slackBot.postMessageToChannel(process.env.SLACK_CHANNEL, message.event.data, {
+        slackBot.postMessageToChannel(process.env.SLACK_CHANNEL, '```' + message.event.data + '```', {
             username: 'Person B',
-            icon_url: process.env.SLACK_ICON
+            icon_url: process.env.SLACK_ICON_B
         });
     }
 
